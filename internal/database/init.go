@@ -176,7 +176,7 @@ func InitializeWorkspaceDatabase(db *sql.DB) error {
 			completed_at TIMESTAMP WITH TIME ZONE,
 			cancelled_at TIMESTAMP WITH TIME ZONE,
 			paused_at TIMESTAMP WITH TIME ZONE,
-			pause_reason TEXT,
+			pause_reason TEXT NOT NULL DEFAULT '',
 			PRIMARY KEY (id)
 		)`,
 		`CREATE TABLE IF NOT EXISTS message_history (

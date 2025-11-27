@@ -43,7 +43,7 @@ func (m *V5Migration) UpdateWorkspace(ctx context.Context, config *config.Config
 	// Using IF NOT EXISTS to make the migration idempotent
 	_, err := db.ExecContext(ctx, `
 		ALTER TABLE broadcasts
-		ADD COLUMN IF NOT EXISTS pause_reason TEXT
+		ADD COLUMN IF NOT EXISTS pause_reason TEXT NOT NULL DEFAULT ''
 	`)
 	if err != nil {
 		return fmt.Errorf("failed to add pause_reason column to broadcasts table for workspace %s: %w", workspace.ID, err)

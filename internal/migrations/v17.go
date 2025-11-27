@@ -49,13 +49,21 @@ func (m *V17Migration) UpdateSystem(ctx context.Context, config *config.Config, 
 func (m *V17Migration) UpdateWorkspace(ctx context.Context, config *config.Config, workspace *domain.Workspace, db DBExecutor) error {
 	// ===== BROADCASTS TABLE =====
 
-	// Add pause_reason column
+	// Add pause_reason column with default empty string
 	_, err := db.ExecContext(ctx, `
 		ALTER TABLE broadcasts
-		ADD COLUMN IF NOT EXISTS pause_reason TEXT
+		ADD COLUMN IF NOT EXISTS pause_reason TEXT NOT NULL DEFAULT ''
 	`)
 	if err != nil {
 		return fmt.Errorf("failed to add pause_reason column to broadcasts: %w", err)
+	}
+
+	// Update existing NULL values to empty string
+	_, err = db.ExecContext(ctx, `
+		UPDATE broadcasts SET pause_reason = '' WHERE pause_reason IS NULL
+	`)
+	if err != nil {
+		return fmt.Errorf("failed to update NULL pause_reason values: %w", err)
 	}
 
 	// Migrate audience structure: convert lists array to single list, remove skip_duplicate_emails
